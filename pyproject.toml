@@ -15,6 +15,7 @@ barista-greet = "barista.greet:main"
 
 [dependency-groups]
 dev = [
+  "pre-commit>=3.7",
   "pytest>=8.0",
   "ruff>=0.6",
 ]
