@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "barista"
+version = "0.0.0"
+description = "Barista example project"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+barista-greet = "barista.greet:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/barista"]

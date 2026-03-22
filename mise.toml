@@ -1,14 +1,19 @@
 [tools]
 python = "3.12"
+uv = "latest"
 
 [tasks.test]
 description = "Run tests"
-run = "python -m pytest"
+run = "uv run pytest"
 
 [tasks.lint]
 description = "Run lint checks"
-run = "python -m ruff check ."
+run = "uv run ruff check ."
 
 [tasks.run]
-description = "Run the project module"
-run = "python -m barista"
+description = "Run greeting script"
+run = "uv run python -m barista.greet"
+
+[tasks.sync]
+description = "Install project dependencies"
+run = "uv sync"
