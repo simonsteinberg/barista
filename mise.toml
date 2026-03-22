@@ -1,0 +1,14 @@
+[tools]
+python = "3.12"
+
+[tasks.test]
+description = "Run tests"
+run = "python -m pytest"
+
+[tasks.lint]
+description = "Run lint checks"
+run = "python -m ruff check ."
+
+[tasks.run]
+description = "Run the project module"
+run = "python -m barista"
