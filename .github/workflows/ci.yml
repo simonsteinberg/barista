@@ -9,6 +9,8 @@ on:
 jobs:
   lint-and-coverage:
     runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - name: Checkout
@@ -30,10 +32,16 @@ jobs:
         run: mise run coverage-ci
 
       - name: Upload coverage to Codecov
+        if: ${{ env.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ env.CODECOV_TOKEN }}
           files: reports/coverage.xml
           fail_ci_if_error: true
+
+      - name: Skip Codecov upload (missing token)
+        if: ${{ env.CODECOV_TOKEN == '' }}
+        run: echo "CODECOV_TOKEN is not configured; skipping Codecov upload."
 
       - name: Upload test and coverage artifacts
         uses: actions/upload-artifact@v4

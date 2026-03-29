@@ -31,3 +31,4 @@ Expected output:
 
 - Pre-commit runs lint and test before each commit.
 - CI runs lint and test on pull requests and on pushes to `main`.
+- Coverage percentage badge is published via Codecov (requires repository secret `CODECOV_TOKEN`).
