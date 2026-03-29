@@ -6,6 +6,14 @@ uv = "latest"
 description = "Run tests"
 run = "uv run pytest"
 
+[tasks.coverage]
+description = "Run tests with coverage report"
+run = "uv run pytest --cov=barista --cov-report=term-missing"
+
+[tasks.coverage-ci]
+description = "Run tests for CI with JUnit XML and HTML coverage artifacts"
+run = "mkdir -p reports && uv run pytest --junitxml=reports/junit.xml --cov=barista --cov-report=term-missing --cov-report=html:reports/htmlcov --cov-report=xml:reports/coverage.xml"
+
 [tasks.lint]
 description = "Run lint checks"
 run = "uv run ruff check ."

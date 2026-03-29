@@ -1,5 +1,8 @@
 # barista
 
+[![CI](https://github.com/simonsteinberg/barista/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/simonsteinberg/barista/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/simonsteinberg/barista/branch/main/graph/badge.svg)](https://codecov.io/gh/simonsteinberg/barista)
+
 Minimal Python project managed with mise and uv.
 
 ## Quickstart

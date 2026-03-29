@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  lint-and-test:
+  lint-and-coverage:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,5 +26,18 @@ jobs:
       - name: Lint
         run: mise run lint
 
-      - name: Test
-        run: mise run test
+      - name: Coverage (terminal + JUnit XML + HTML)
+        run: mise run coverage-ci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: reports/coverage.xml
+          fail_ci_if_error: true
+
+      - name: Upload test and coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-and-coverage-reports
+          path: reports/
+          if-no-files-found: error
