@@ -34,3 +34,49 @@
 - Prefer minimal, targeted edits.
 - Do not revert unrelated local changes.
 - Keep public APIs stable unless a change is explicitly requested.
+
+## Agentic workflow template rules
+- This repository is a template for production-grade agentic workflows.
+- When the user asks to generate or modify agentic workflows, default to Python + PydanticAI.
+- Follow the WAT pattern strictly:
+  - Workflows: orchestration and control flow only.
+  - Agents: reasoning and decision logic only.
+  - Tools: deterministic capabilities and side effects only.
+- Keep orchestration outside prompts. Prompts should not encode workflow routing, retries, or policy decisions.
+
+## Architecture and folder conventions for agentic workflows
+- Use this structure for new workflow features:
+  - src/barista/workflows/ -> workflow orchestration, state transitions, routing, retries, and checkpoints.
+  - src/barista/agents/ -> agent definitions, system prompts, and reasoning policies.
+  - src/barista/tools/ -> tool implementations, tool schemas, and external integrations.
+  - src/barista/schemas/ -> Pydantic request/response/state models.
+  - src/barista/guardrails/ -> safety policies, budget limits, timeout rules, and validation.
+  - tests/workflows/ -> workflow integration and replay tests.
+  - tests/agents/ -> agent behavior tests with mocked tools/models.
+  - tests/tools/ -> deterministic tool unit tests.
+
+## Determinism, safety, and robustness requirements
+- Determinism:
+  - Use typed state models (Pydantic) for workflow state.
+  - Make workflow transitions explicit and replayable.
+  - Prefer stable serialization and hashable checkpoints for replay tests.
+- Safety:
+  - Enforce tool allowlists/denylists per environment.
+  - Validate all tool inputs and outputs with Pydantic models.
+  - Add timeouts, retries with backoff, and bounded retry counts.
+- Robustness and failure tolerance:
+  - Fail closed on policy validation errors.
+  - Treat tools as unreliable boundaries; handle transient failures explicitly.
+  - Add fallback paths and error states instead of silent failures.
+- Cost efficiency:
+  - Use model selection policies (cheap model first when acceptable).
+  - Add response caching where deterministic and safe.
+  - Track token/cost budgets in workflows and enforce hard caps.
+
+## Implementation defaults
+- Use PydanticAI for agent/model integration and structured outputs.
+- Keep workflows framework-agnostic; if graph orchestration is needed, LangGraph can be used as the workflow engine while preserving WAT separation.
+- New agentic features must include:
+  - Unit tests for tools and guardrails.
+  - Integration tests for workflow paths and failure cases.
+  - At least one determinism/replay test for non-trivial workflows.
