@@ -38,6 +38,17 @@
 ## Agentic workflow template rules
 - This repository is a template for production-grade agentic workflows.
 - When the user asks to generate or modify agentic workflows, default to Python + PydanticAI.
+- For repositories with multiple workflows, scope docs per workflow to avoid file collisions.
+- For every new workflow `<workflow_slug>`, start by writing requirements in `docs/workflows/<workflow_slug>/specification.md` using SHALL language.
+- After requirements, write an implementation plan in `docs/workflows/<workflow_slug>/plan.md`.
+- If requirements are unclear, ask the user before implementing.
+- Add a comprehensive README for each workflow at `docs/workflows/<workflow_slug>/README.md`.
+- Add a unique `mise` task for each new runnable workflow (for example `workflow-<workflow_slug>`).
+- When modifying an existing workflow, update only that workflow's scoped docs.
+- Use canonical workflow docs structure under `docs/workflows/<workflow_slug>/`:
+  - `specification.md`: Problem Statement, Stakeholders, Requirements (SHALL), Non-Goals, Acceptance Criteria.
+  - `plan.md`: Scope, Architecture and WAT Mapping, Milestones, Test Strategy, Rollout and Validation.
+  - `README.md`: Purpose, Inputs and Outputs, Architecture, Running, Configuration, Testing, Limitations.
 - Follow the WAT pattern strictly:
   - Workflows: orchestration and control flow only.
   - Agents: reasoning and decision logic only.

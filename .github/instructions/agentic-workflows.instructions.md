@@ -5,6 +5,42 @@ description: "Use when creating or modifying agentic workflows, agents, tools, g
 
 # Agentic Workflow Generation Rules
 
+## Process requirements (required)
+- For repositories with multiple workflows, keep workflow docs scoped per workflow to avoid collisions.
+- For each new workflow `<workflow_slug>`, create or update `docs/workflows/<workflow_slug>/specification.md`.
+- In each workflow's `specification.md`, write product-stakeholder requirements using explicit SHALL language.
+- After `specification.md`, create or update `docs/workflows/<workflow_slug>/plan.md` with a concrete implementation plan.
+- If any requirement is ambiguous or missing, ask the user for clarification before implementation.
+- For each workflow, add a comprehensive README at `docs/workflows/<workflow_slug>/README.md` that explains purpose, architecture, execution, inputs/outputs, and testing.
+- For each new runnable workflow, add a corresponding unique `mise` task in `mise.toml` (for example `workflow-<workflow_slug>`).
+- When modifying an existing workflow, update only that workflow's scoped docs (`specification.md`, `plan.md`, `README.md`).
+
+## Workflow docs template (required)
+- Workflow docs root SHALL be `docs/workflows/<workflow_slug>/`.
+- `specification.md` SHALL contain these sections in order:
+	- `# Specification: <Workflow Name>`
+	- `## Problem Statement`
+	- `## Stakeholders`
+	- `## Requirements (SHALL)`
+	- `## Non-Goals`
+	- `## Acceptance Criteria`
+- `plan.md` SHALL contain these sections in order:
+	- `# Implementation Plan: <Workflow Name>`
+	- `## Scope`
+	- `## Architecture and WAT Mapping`
+	- `## Milestones`
+	- `## Test Strategy`
+	- `## Rollout and Validation`
+- `README.md` SHALL contain these sections in order:
+	- `# <Workflow Name>`
+	- `## Purpose`
+	- `## Inputs and Outputs`
+	- `## Architecture`
+	- `## Running`
+	- `## Configuration`
+	- `## Testing`
+	- `## Limitations`
+
 ## Stack defaults
 - Default to Python + PydanticAI for agentic workflow implementation.
 - Keep model provider usage behind typed interfaces to avoid lock-in.
