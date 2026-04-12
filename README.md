@@ -27,6 +27,30 @@ Expected output:
 
 	Hello barista (version <CURRENT_VERSION>)
 
+## Project Setup and Customization
+
+### Rename the project
+
+Use the `setup-repo` task to rename the entire project from `barista` to your desired project name:
+
+```bash
+mise run setup-repo -- myproject
+```
+
+This task will:
+- Rename the `src/barista/` directory to `src/myproject/`
+- Replace all occurrences of `barista` with `myproject` across the repository (in Python files, configuration files, documentation, etc.)
+- Exclude git, cache, and build directories from the search
+
+**Example:**
+```bash
+mise run setup-repo -- workflow_engine
+```
+
+**Requirements for the project name:**
+- Must start with a letter or underscore
+- Can only contain alphanumeric characters and underscores (no hyphens or special characters)
+
 ## Quality checks
 
 - Pre-commit runs lint and test before each commit.
