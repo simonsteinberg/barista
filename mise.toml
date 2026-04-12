@@ -25,3 +25,7 @@ run = "uv run python -m barista.greet"
 [tasks.sync]
 description = "Install project dependencies"
 run = "uv sync"
+
+[tasks.setup-repo]
+description = "Rename project from 'barista' to a specified name"
+run = ".tasks/setup-repo.sh"
