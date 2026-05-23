@@ -29,6 +29,7 @@
 - Aim for comprehensive and concise tests that cover expected behavior, edge cases, and regressions without unnecessary duplication.
 
 ## Quality checks before commit
+- Run formatting before linting and testing: `mise run format && mise run lint` before `mise run test`.
 - Run lint checks before committing changes.
 - Run the relevant tests before committing changes.
 - If changing behavior, ensure tests cover the change.

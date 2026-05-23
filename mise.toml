@@ -6,6 +6,10 @@ uv = "latest"
 description = "Run tests"
 run = "uv run pytest"
 
+[tasks.format]
+description = "Run code formatter"
+run = "uv run ruff format ."
+
 [tasks.coverage]
 description = "Run tests with coverage report"
 run = "uv run pytest --cov=barista --cov-report=term-missing"
