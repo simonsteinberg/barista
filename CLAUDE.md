@@ -41,6 +41,15 @@
 - Do not revert unrelated local changes.
 - Keep public APIs stable unless a change is explicitly requested.
 
+## General principles
+- Raise the bar: leave touched code clearer or safer when it fits the task scope.
+- Prefer clarity over cleverness; choose the simplest correct solution.
+- Preserve behavior and UX unless a change is explicitly requested.
+- Apply separation of concerns; keep orchestration, reasoning, and side effects distinct.
+- Make changes verifiable with focused tests that prove the behavior you touched.
+- Document intent, not mechanics; only comment when logic is non-obvious.
+- Fail loudly; do not swallow errors or hide failures.
+
 ## Agentic workflow template rules
 - This repository is a template for production-grade agentic workflows.
 - When the user asks to generate or modify agentic workflows, default to Python + PydanticAI.
