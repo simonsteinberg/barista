@@ -33,6 +33,7 @@
 - Run the relevant tests before committing changes.
 - If changing behavior, ensure tests cover the change.
 - Do not finish work until linting and all relevant tests pass successfully.
+- Use commit messages that start with a keyword like feat | fix | chore | docs | ..., followed by a parenthesized scope when applicable (e.g., fix(front-end): ...). Then write a concise message explaining what changed and why.
 
 ## Practical expectations
 - Prefer minimal, targeted edits.
