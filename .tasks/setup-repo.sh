@@ -15,23 +15,37 @@ if ! [[ "$NEW_NAME" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
   exit 1
 fi
 
-if [[ ! -d "src" ]]; then
-  echo "Error: src/ directory not found. Cannot infer current project name."
+PROJECT_NAME=""
+if [[ -f "pyproject.toml" ]]; then
+  PROJECT_NAME="$(awk -F' = ' '
+    $0 ~ /^\[project\]$/ { in_project = 1; next }
+    in_project && $1 == "name" {
+      gsub(/"/, "", $2);
+      print $2;
+      exit
+    }
+    in_project && $0 ~ /^\[/ { in_project = 0 }
+  ' pyproject.toml)"
+fi
+
+SRC_NAME=""
+if [[ -d "src" ]]; then
+  SRC_NAME="$(find src -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | head -n 1)"
+fi
+
+if [[ -z "$SRC_NAME" && -z "$PROJECT_NAME" ]]; then
+  echo "Error: Cannot infer current project name from src/ or pyproject.toml."
   exit 1
 fi
 
-CURRENT_NAME="$(find src -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | head -n 1)"
-if [[ -z "$CURRENT_NAME" ]]; then
-  echo "Error: No project directories found under src/. Cannot infer current project name."
-  exit 1
-fi
+CURRENT_NAME="${SRC_NAME:-$PROJECT_NAME}"
 
 echo "Renaming project from '$CURRENT_NAME' to '$NEW_NAME'..."
 
 # Rename directory if it exists
-if [[ "$CURRENT_NAME" != "$NEW_NAME" && -d "src/${CURRENT_NAME}" ]]; then
-  mv "src/${CURRENT_NAME}" "src/${NEW_NAME}"
-  echo "✓ Renamed src/${CURRENT_NAME} → src/${NEW_NAME}"
+if [[ -n "$SRC_NAME" && "$SRC_NAME" != "$NEW_NAME" && -d "src/${SRC_NAME}" ]]; then
+  mv "src/${SRC_NAME}" "src/${NEW_NAME}"
+  echo "✓ Renamed src/${SRC_NAME} → src/${NEW_NAME}"
 fi
 
 # Build legacy name variants (case variations + double-letter typos)
@@ -43,16 +57,27 @@ add_legacy_name() {
   fi
 }
 
-add_legacy_name "$CURRENT_NAME"
-add_legacy_name "${CURRENT_NAME,,}"
-add_legacy_name "${CURRENT_NAME^^}"
-add_legacy_name "${CURRENT_NAME^}"
+add_variants() {
+  local base="$1"
+  add_legacy_name "$base"
+  add_legacy_name "${base,,}"
+  add_legacy_name "${base^^}"
+  add_legacy_name "${base^}"
 
-for ((i=0; i<${#CURRENT_NAME}; i++)); do
-  ch="${CURRENT_NAME:$i:1}"
-  variant="${CURRENT_NAME:0:$((i+1))}${ch}${CURRENT_NAME:$((i+1))}"
-  add_legacy_name "$variant"
-done
+  for ((i=0; i<${#base}; i++)); do
+    ch="${base:$i:1}"
+    variant="${base:0:$((i+1))}${ch}${base:$((i+1))}"
+    add_legacy_name "$variant"
+  done
+}
+
+if [[ -n "$SRC_NAME" ]]; then
+  add_variants "$SRC_NAME"
+fi
+
+if [[ -n "$PROJECT_NAME" && "$PROJECT_NAME" != "$SRC_NAME" ]]; then
+  add_variants "$PROJECT_NAME"
+fi
 
 existing_variants=("${!LEGACY_NAMES[@]}")
 for variant in "${existing_variants[@]}"; do
@@ -65,7 +90,7 @@ legacy_list=($(printf '%s\n' "${!LEGACY_NAMES[@]}" | sort))
 perl_args=()
 for legacy in "${legacy_list[@]}"; do
   if [[ "$legacy" != "$NEW_NAME" ]]; then
-    perl_args+=("-e" "s/\\Q${legacy}\\E/${NEW_NAME}/g")
+    perl_args+=("-e" "s/\\Q${legacy}\\E/${NEW_NAME}/g;")
   fi
 done
 
@@ -87,3 +112,4 @@ fi
 
 echo "✓ Replaced all occurrences of legacy names with '$NEW_NAME'"
 echo "Setup complete!"
+
