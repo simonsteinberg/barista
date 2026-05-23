@@ -25,6 +25,7 @@
 ## General principles
 
 - Make minimal, targeted edits; do not disturb unrelated code
+- Good code is easy to change; all AI-authored code should stay easy to change as requirements evolve
 - Keep public APIs stable unless a change is explicitly requested
 - Apply separation of concerns — keep orchestration, reasoning, and side effects distinct (see WAT below)
 - Fail loudly: do not swallow errors or hide failures
