@@ -1,5 +1,12 @@
 # Barista Agent — CLAUDE.md
 
+## Additional instructions
+
+- [.agent/SOFTWARE_ENGINEERING.md](.agent/SOFTWARE_ENGINEERING.md) — the reasoning ("why") behind the rules in this file. Read it alongside this checklist; when the two appear to conflict, this file is the operational source of truth.
+- [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) — the current design and requirements of the system. Treat it as the authoritative description of *what* is being built and *why*.
+
+**Keep [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) current.** Whenever a session changes design or requirements — new or altered requirements, a different architecture or component boundary, a changed data model, or a non-trivial trade-off decision — update that doc in the same change so it never drifts from the code. If a session does not affect design or requirements, leave it untouched.
+
 ## Project layout
 
 - Application/business logic: `src/barista/`
@@ -23,6 +30,7 @@
 | `mise run format` | Auto-format code |
 | `mise run lint` | Run linter |
 | `mise run test` | Run test suite |
+| `mise run coverage` | Run tests with a coverage report |
 
 - Add a unique `mise` task for every new runnable workflow: `mise run workflow-<slug>`
 
