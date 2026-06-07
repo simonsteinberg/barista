@@ -1,5 +1,5 @@
 ---
-applyTo: "src/barista/**/*.py,tests/**/*.py"
+applyTo: ".agents/**/*.py,tests/**/*.py"
 description: "Use when creating or modifying agentic workflows, agents, tools, guardrails, or workflow schemas. Enforces PydanticAI + WAT architecture with determinism, safety, robustness, and cost controls."
 ---
 
@@ -47,17 +47,18 @@ description: "Use when creating or modifying agentic workflows, agents, tools, g
 - Prefer deterministic execution paths over purely conversational loops.
 
 ## WAT separation (required)
-- Workflows layer (`src/barista/workflows/`): orchestration only (routing, retries, checkpoints, state transitions).
-- Agents layer (`src/barista/agents/`): reasoning and planning only.
-- Tools layer (`src/barista/tools/`): deterministic side effects and external integrations.
+- Agentic code lives in isolated subprojects under `.agents/<subproject>/`, each with its own `pyproject.toml`, `mise.toml`, and `src/` tree. Do **not** add agentic dependencies to the main `pyproject.toml`.
+- Workflows layer (`.agents/workflows/`): orchestration only (routing, retries, checkpoints, state transitions).
+- Agents layer (`.agents/agents/`): reasoning and planning only.
+- Tools layer (`.agents/tools/`): deterministic side effects and external integrations.
 - Do not mix orchestration logic into prompts or tools.
 
 ## Required structure for new features
-- `src/barista/workflows/`
-- `src/barista/agents/`
-- `src/barista/tools/`
-- `src/barista/schemas/`
-- `src/barista/guardrails/`
+- `.agents/workflows/`
+- `.agents/agents/`
+- `.agents/tools/`
+- `.agents/schemas/`
+- `.agents/guardrails/`
 - `tests/workflows/`
 - `tests/agents/`
 - `tests/tools/`

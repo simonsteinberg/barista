@@ -4,8 +4,24 @@
 
 - [.agent/SOFTWARE_ENGINEERING.md](.agent/SOFTWARE_ENGINEERING.md) — the reasoning ("why") behind the rules in this file. Read it alongside this checklist; when the two appear to conflict, this file is the operational source of truth.
 - [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) — the current design and requirements of the system. Treat it as the authoritative description of *what* is being built and *why*.
+- [.agent/VERSIONING.md](.agent/VERSIONING.md) — the full versioning and release policy (SemVer scheme, release tooling, changelog discipline, and how to retire a vulnerable version). The operational checklist lives in [Versioning and Releases](#versioning-and-releases) below; that doc is the "why" and the full detail.
 
 **Keep [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) current.** Whenever a session changes design or requirements — new or altered requirements, a different architecture or component boundary, a changed data model, or a non-trivial trade-off decision — update that doc in the same change so it never drifts from the code. If a session does not affect design or requirements, leave it untouched.
+
+## Repository status
+
+This is a **starter/template** repository. The only application code today is a
+`greet` CLI ([src/barista/greet.py](src/barista/greet.py)); the agentic / WAT /
+PydanticAI material below is **forward-looking convention**, not existing code — there
+is currently no PydanticAI dependency, no `.agents/`, and no `src/barista/workflows`,
+`agents`, or `tools` packages. Treat those sections as the rules to follow *when you
+build* such features, not as a description of what exists.
+
+`barista` is a placeholder package name. Rename the whole project with:
+
+```bash
+mise run setup-repo -- <new_name>   # renames src/barista/ and rewrites references
+```
 
 ## Project layout
 
@@ -33,6 +49,26 @@
 | `mise run coverage` | Run tests with a coverage report |
 
 - Add a unique `mise` task for every new runnable workflow: `mise run workflow-<slug>`
+
+### Common commands
+
+```bash
+# First-time setup
+mise install && mise run sync && uv run pre-commit install
+
+# Run the CLI
+uv run barista-greet          # installed entry point
+mise run run                  # equivalent: python -m barista.greet
+
+# Tests
+mise run test                                         # full suite
+uv run pytest tests/test_greet.py::test_get_version   # a single test
+mise run coverage                                     # suite + coverage report
+```
+
+**Coverage is a hard gate:** `fail_under = 90` in [pyproject.toml](pyproject.toml), enforced in CI via `coverage-ci`. A drop below 90% fails the build.
+
+> **Enforced gates vs. local hygiene.** The pre-commit hook runs **lint + test**; CI runs **lint + coverage-ci**. Neither gate runs `mise run format`, so formatting is local hygiene you must apply yourself — run it before committing (see Pre-commit checklist), but know that only lint and tests block a commit/merge.
 
 ## General principles
 
@@ -133,13 +169,13 @@ mise run format && mise run lint
 ```
 Fix all reported issues, then re-run. Repeat until both pass with no warnings or errors.
 
-**Loop 2 — tests (repeat until green)**
+**Loop 2 — tests and coverage (repeat until green)**
 ```
-mise run test
+mise run coverage
 ```
-Fix all failures, then re-run. Repeat until the full suite passes.
+Use `mise run coverage` (not bare `mise run test`) so you verify against the same 90% floor CI enforces — passing tests with coverage below `fail_under = 90` will still fail CI. Fix all failures, then re-run until the suite passes and coverage clears the floor.
 
-Do not move from loop 1 to loop 2 while lint is still failing. Do not commit while any test is failing.
+Do not move from loop 1 to loop 2 while lint is still failing. Do not commit while any test is failing or coverage is below the floor.
 
 Commit message format: `<type>(<scope>): <concise description of what and why>`
 
@@ -151,25 +187,64 @@ Example: `feat(barista): add retry backoff to espresso tool`
 
 - Start from an up-to-date `main` and create a short-lived branch.
 - Make the smallest change that fully solves the task.
-- Complete the pre-commit checklist (format, lint, tests).
+- Complete the pre-commit checklist (format, lint, tests + coverage).
 - Commit with the required message format.
 - Open a PR with a clear summary and explicit testing notes.
 - Do not merge until CI is green and any required reviews are complete.
 - Merge and delete the branch; sync `main`.
 
-## Continuous integration discipline
+## Integration and deployability
 
-- Integrate with the mainline branch frequently — at minimum daily, ideally every completed unit of work
-- Keep branches short-lived; a branch that lives longer than a day is a liability accumulating merge risk
-- `main` must remain releasable at all times — do not merge code that breaks the build, fails tests, or leaves a feature half-wired without a flag
-- Use feature flags to merge incomplete work safely rather than keeping long-running branches
-- If a change is too large to integrate safely in one go, break it into smaller steps that each leave the system in a valid state
+- Integrate with `main` frequently — at minimum daily, ideally every completed unit of work; keep branches short-lived (a branch older than a day accumulates merge risk).
+- `main` must stay releasable at all times: never merge code that breaks the build, fails tests or coverage, or leaves a feature half-wired. Hide incomplete work behind a feature flag rather than keeping a long-running branch.
+- If a change is too large to land safely in one go, break it into smaller steps that each leave the system green.
+- A broken `main` is the highest-priority fix — nothing else takes precedence until it is green.
 
-## Deployability
+## Versioning and Releases
 
-- Every commit merged to `main` should be releasable — not necessarily released, but ready to be
-- Incomplete features must be hidden behind a flag or left fully inactive, not left partially wired
-- Treat a broken `main` as the highest priority fix; nothing else takes precedence until it is green
+`barista` follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`). The
+canonical version lives in **one place** — the `version` field of [pyproject.toml](pyproject.toml)
+— and the runtime reads it back through `barista.greet.get_version()`. **Never hand-edit the
+version string**; always bump it with the release task. Pre-1.0, `MINOR` absorbs breaking
+changes and `PATCH` absorbs fixes. See [.agent/VERSIONING.md](.agent/VERSIONING.md) for the
+full policy, including how to retire a version with a security bug.
+
+### Cutting a release
+
+1. Land the work on `main` and record it under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md)
+   (categories: Added / Changed / Deprecated / Removed / Fixed / Security).
+2. From an up-to-date, clean `main`, run the release task with the part you are bumping:
+
+   ```bash
+   mise run release -- patch     # 0.1.0 -> 0.1.1  (backward-compatible fix)
+   mise run release -- minor     # 0.1.0 -> 0.2.0  (backward-compatible feature)
+   mise run release -- major     # 0.1.0 -> 1.0.0  (breaking change)
+   ```
+
+   The task guards (on `main`, clean tree, synced with `origin/main`, non-empty `[Unreleased]`),
+   runs `mise run check`, bumps `pyproject.toml`, rolls the changelog, commits `chore(release): vX.Y.Z`,
+   creates an annotated `vX.Y.Z` tag, and pushes with `--follow-tags`.
+3. Pushing the tag triggers [.github/workflows/release.yml](.github/workflows/release.yml), which
+   verifies the tag matches `pyproject.toml`, re-runs the checks, extracts that version's changelog
+   notes, and publishes the GitHub Release (pre-release tags `-alpha`/`-beta`/`-rc` are flagged).
+
+The very first/baseline release is published by tagging the current version directly (the release
+task always *bumps*): `git tag -a v0.1.0 -m v0.1.0 && git push --follow-tags`.
+
+### Maintaining `CHANGELOG.md`
+
+[CHANGELOG.md](CHANGELOG.md) follows [Keep a Changelog](https://keepachangelog.com/). Add every
+user-facing change under `## [Unreleased]` as it merges — do not wait for release time, and do not
+hand-edit already-released sections (the release task owns rolling `[Unreleased]` into a dated
+section and maintaining the link references). `mise run changelog-check` fails a release if
+`[Unreleased]` is empty, so every release carries notes.
+
+| Task | Purpose |
+|------|---------|
+| `mise run version` | Print the current version |
+| `mise run check` | Pre-release gate: format check, lint, tests + coverage |
+| `mise run changelog-check` | Fail if `[Unreleased]` has no entries |
+| `mise run release -- {patch\|minor\|major}` | Bump, roll changelog, commit, tag, push |
 
 ## Security and data handling
 
