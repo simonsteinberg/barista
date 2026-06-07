@@ -9,4 +9,9 @@ release policy.
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/simonsteinberg/barista/commits/main
+## [0.1.0] - 2026-06-07
+
+Initial release.
+
+[Unreleased]: https://github.com/simonsteinberg/barista/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/simonsteinberg/barista/releases/tag/v0.1.0
