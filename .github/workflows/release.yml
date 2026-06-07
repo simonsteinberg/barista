@@ -43,7 +43,7 @@ jobs:
       - name: Extract changelog notes
         run: |
           version="$(uv version --short)"
-          .tasks/changelog-extract.sh "$version" > RELEASE_NOTES.md
+          .scripts/changelog-extract.sh "$version" > RELEASE_NOTES.md
           echo "----- release notes -----"
           cat RELEASE_NOTES.md
 

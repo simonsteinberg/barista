@@ -91,11 +91,11 @@ mise run release -- minor     # 0.1.0 -> 0.2.0
 mise run release -- major     # 0.1.0 -> 1.0.0
 ```
 
-[`.tasks/release.sh`](../.tasks/release.sh) performs, in order:
+[`.scripts/release.sh`](../.scripts/release.sh) performs, in order:
 
 1. **Guards** — refuses unless you are on `main`, the working tree is clean, and
    local `main` matches `origin/main`.
-2. **Changelog guard** — `.tasks/changelog-check.sh` fails if the `[Unreleased]`
+2. **Changelog guard** — `.scripts/changelog-check.sh` fails if the `[Unreleased]`
    section of [`CHANGELOG.md`](../CHANGELOG.md) is empty. Every release must carry
    notes.
 3. **Full check** — runs `mise run check` (format check, lint, and tests with the
@@ -121,7 +121,7 @@ Pushing the tag hands off to the release workflow.
 4. Re-runs `mise run check` against the tagged commit (independent verification,
    not just trust in the local run).
 5. Extracts that version's section from `CHANGELOG.md`
-   (`.tasks/changelog-extract.sh`) to use as the release notes.
+   (`.scripts/changelog-extract.sh`) to use as the release notes.
 6. Creates the GitHub Release with `gh release create`, flagging pre-release tags
    (`-rc`/`-alpha`/`-beta`) as pre-releases.
 
@@ -223,8 +223,8 @@ complete retirement.
 |------|------|
 | `pyproject.toml` | Canonical version number |
 | `CHANGELOG.md` | Human-written history (Keep a Changelog) |
-| `.tasks/release.sh` | Bump + changelog + commit + tag + push |
-| `.tasks/changelog-check.sh` | Guards a non-empty `[Unreleased]` |
-| `.tasks/changelog-extract.sh` | Extracts a version's notes for the Release |
+| `.scripts/release.sh` | Bump + changelog + commit + tag + push |
+| `.scripts/changelog-check.sh` | Guards a non-empty `[Unreleased]` |
+| `.scripts/changelog-extract.sh` | Extracts a version's notes for the Release |
 | `.github/workflows/release.yml` | Tag-triggered Release publisher |
 | `src/barista/greet.py` | Runtime version read (`get_version`) |

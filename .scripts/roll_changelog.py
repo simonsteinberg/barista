@@ -5,7 +5,7 @@ Promotes the ``[Unreleased]`` section to a dated ``[X.Y.Z]`` section, opens a
 fresh empty ``[Unreleased]``, and regenerates the GitHub compare/tag link
 references at the bottom of the file.
 
-Driven by ``.tasks/release.sh`` via environment variables:
+Driven by ``.scripts/release.sh`` via environment variables:
 
 - ``NEW_VERSION`` — the version being released, e.g. ``0.1.0``
 - ``RELEASE_DATE`` — ISO date for the section heading, e.g. ``2026-06-07``

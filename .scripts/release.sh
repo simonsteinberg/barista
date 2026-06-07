@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Cut a release: bump the version, roll the changelog, commit, tag, and push.
-# Usage: .tasks/release.sh {patch|minor|major}
+# Usage: .scripts/release.sh {patch|minor|major}
 #   (invoke via: mise run release -- patch)
 #
 # See .agent/VERSIONING.md for the full policy. This script never cuts a release
@@ -42,7 +42,7 @@ if [[ "$local_sha" != "$remote_sha" ]]; then
 fi
 
 # --- Changelog must carry notes -------------------------------------------
-.tasks/changelog-check.sh
+.scripts/changelog-check.sh
 
 # --- Never release from a red tree ----------------------------------------
 mise run check
@@ -64,7 +64,7 @@ SLUG="$(git remote get-url origin \
   | sed -E 's#^git@[^:]+:#https://github.com/#; s#^https?://[^/]+/##; s#\.git$##')"
 
 NEW_VERSION="$NEW_VERSION" RELEASE_DATE="$RELEASE_DATE" SLUG="$SLUG" \
-  uv run python .tasks/roll_changelog.py
+  uv run python .scripts/roll_changelog.py
 
 # --- Commit, tag, push -----------------------------------------------------
 git add pyproject.toml uv.lock CHANGELOG.md
