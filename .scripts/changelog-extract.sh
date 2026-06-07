@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Print the changelog body for a given version, for use as GitHub Release notes.
-# Usage: .tasks/changelog-extract.sh <version> [changelog-path]
-# Example: .tasks/changelog-extract.sh 0.1.0
+# Usage: .scripts/changelog-extract.sh <version> [changelog-path]
+# Example: .scripts/changelog-extract.sh 0.1.0
 set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: .tasks/changelog-extract.sh <version> [changelog-path]" >&2
+  echo "Usage: .scripts/changelog-extract.sh <version> [changelog-path]" >&2
   exit 1
 fi
 

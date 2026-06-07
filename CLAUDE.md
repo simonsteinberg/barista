@@ -46,6 +46,7 @@ mise run setup-repo -- <new_name>   # renames src/barista/ and rewrites referenc
 
 - Application/business logic: `src/barista/`
 - Agentic projects (isolated): `.agents/<subproject>/` — each with its own `pyproject.toml`, `mise.toml`, and `src/` tree
+- Repo automation scripts (back the `mise` tasks): `.scripts/` — see [.scripts/README.md](.scripts/README.md)
 - Tests: `tests/`
 - Project metadata and tool config: `pyproject.toml`, `mise.toml`
 
@@ -68,6 +69,23 @@ mise run setup-repo -- <new_name>   # renames src/barista/ and rewrites referenc
 | `mise run coverage` | Run tests with a coverage report |
 
 - Add a unique `mise` task for every new runnable workflow: `mise run workflow-<slug>`
+
+### Repo scripts (`.scripts/`)
+
+The backing scripts for our `mise` tasks (project setup and the release/changelog
+workflow) live in [`.scripts/`](.scripts/). **These are developer/CI automation
+scripts — distinct from the agentic WAT "tools" layer in `.agents/tools/`.** Always
+invoke them through their `mise` task; the table below is a quick index, and
+[.scripts/README.md](.scripts/README.md) documents each one in full (usage,
+arguments, when to use).
+
+| Script | Invoke via | Purpose |
+|--------|-----------|---------|
+| `setup-repo.sh` | `mise run setup-repo -- <name>` | Rename the project off the `barista` placeholder |
+| `release.sh` | `mise run release -- {patch\|minor\|major}` | Cut a release (bump, changelog, commit, tag, push) |
+| `changelog-check.sh` | `mise run changelog-check` | Fail if `[Unreleased]` is empty |
+| `changelog-extract.sh` | called by the release workflow | Extract a version's notes for the GitHub Release |
+| `roll_changelog.py` | called by `release.sh` | Promote `[Unreleased]` and rebuild changelog links |
 
 ### Common commands
 

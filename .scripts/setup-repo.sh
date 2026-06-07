@@ -2,8 +2,8 @@
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
-  echo "Usage: .tasks/setup-repo.sh <new-project-name>"
-  echo "Example: .tasks/setup-repo.sh myproject"
+  echo "Usage: .scripts/setup-repo.sh <new-project-name>"
+  echo "Example: .scripts/setup-repo.sh myproject"
   exit 1
 fi
 
