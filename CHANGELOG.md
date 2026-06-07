@@ -11,6 +11,10 @@ release policy.
 
 ### Added
 
+- **Standard procedure** in [CLAUDE.md](CLAUDE.md): the default end-to-end
+  implementation workflow (issue → worktree branch → plan → clarify → implement →
+  docs → lint/test loop → PR → green CI → ask-before-merge → tidy up → summary)
+  that AI agents follow for fixes, features, and chores.
 - Versioning and release tooling: `mise run version`, `mise run check`,
   `mise run changelog-check`, and `mise run release -- {patch|minor|major}`,
   backed by `.tasks/release.sh`, `.tasks/changelog-check.sh`, and

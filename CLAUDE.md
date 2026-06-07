@@ -8,6 +8,25 @@
 
 **Keep [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) current.** Whenever a session changes design or requirements — new or altered requirements, a different architecture or component boundary, a changed data model, or a non-trivial trade-off decision — update that doc in the same change so it never drifts from the code. If a session does not affect design or requirements, leave it untouched.
 
+## Standard procedure (default implementation workflow)
+
+**This is the default way to implement any change** — a bug fix, a new feature, a chore, a refactor, and so on. Follow it in full whenever you are told to use the **"standard procedure"**, to **"make a plan first"**, or whenever a task amounts to a unit of work that lands on `main`. If you are genuinely unsure whether a task warrants the full procedure (for example a one-line typo fix), **ask the user** rather than guessing.
+
+Run these steps in order:
+
+1. **Open a GitHub issue** for the work — `gh issue create` with a clear title and summary. Note the issue number; you reference it from the PR.
+2. **Create a git worktree on a new feature branch**, branched from an up-to-date `main`, under `.worktree/<slug>` (see [Git worktrees](#git-worktrees)): `git worktree add .worktree/<slug> -b <type>/<slug> main`.
+3. **Draft an implementation plan** before writing any code.
+4. **Resolve every unknown with the user — never assume.** If anything about scope, requirements, or design is unclear or underspecified, ask the user, and **offer predefined answer options** so the choice is concrete. Only proceed once the plan is unambiguous. (For a new agentic workflow, also create its scoped specification/plan/README docs first — see [Agentic AI — new workflow checklist](#agentic-ai--new-workflow-checklist).)
+5. **Implement** the change — the smallest change that fully solves the task, following the design, code-style, and testing rules in this file (TDD where applicable).
+6. **Update documentation in the same change** so docs never drift: `CHANGELOG.md` (add entries under `## [Unreleased]`), `CLAUDE.md`, `README.md`, and [docs/DESIGN_AND_REQUIREMENTS.md](docs/DESIGN_AND_REQUIREMENTS.md) when design or requirements change — plus any other affected docs.
+7. **Loop lint and tests until green** — run the [Pre-commit checklist](#pre-commit-checklist) (format + lint, then tests with coverage) repeatedly, fixing issues until everything passes and coverage clears the 90% floor.
+8. **Open a GitHub PR** with a clear summary and explicit testing notes, linking the issue (e.g. `Closes #<n>`). See [Pull request workflow](#pull-request-workflow).
+9. **Wait for CI and loop until it is green** (GitHub Actions). Fix any failure and push again — never hand a red CI back to the user.
+10. **Ask the user to merge to `main`.** Do **not** merge yourself unless the user explicitly authorized it for this task (e.g. *"…implement this using the standard procedure and automatically merge to main when done…"*). Without that explicit authorization, stop after CI is green and ask.
+11. **Tidy up** (after the change has landed on `main`): remove the worktree (`git worktree remove .worktree/<slug>`) and delete the feature branch both locally and on the remote.
+12. **Write a summary to the console** — what changed, the issue and PR links, how it was tested, and anything the user should know.
+
 ## Repository status
 
 This is a **starter/template** repository. The only application code today is a
@@ -185,13 +204,16 @@ Example: `feat(barista): add retry backoff to espresso tool`
 
 ## Pull request workflow
 
-- Start from an up-to-date `main` and create a short-lived branch.
+This is the PR-specific detail of the [Standard procedure](#standard-procedure-default-implementation-workflow) (steps 8–11); follow that procedure end-to-end for any real unit of work.
+
+- Start from an up-to-date `main` and create a short-lived branch (a worktree branch under `.worktree/` per the standard procedure).
 - Make the smallest change that fully solves the task.
 - Complete the pre-commit checklist (format, lint, tests + coverage).
 - Commit with the required message format.
-- Open a PR with a clear summary and explicit testing notes.
+- Open a PR with a clear summary and explicit testing notes, linking its issue.
 - Do not merge until CI is green and any required reviews are complete.
-- Merge and delete the branch; sync `main`.
+- **Do not merge to `main` yourself unless the user explicitly authorized it** (standard procedure, step 10); otherwise ask the user to merge.
+- Once merged, delete the branch locally and remotely and sync `main`.
 
 ## Integration and deployability
 
