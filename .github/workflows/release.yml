@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install tools
+        run: mise install
+
+      - name: Sync dependencies
+        run: mise run sync
+
+      - name: Verify tag matches pyproject version
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          version="$(uv version --short)"
+          if [[ "$tag" != "v${version}" ]]; then
+            echo "Tag '$tag' does not match pyproject version 'v${version}'." >&2
+            exit 1
+          fi
+          echo "Tag $tag matches pyproject version v${version}."
+
+      - name: Run checks
+        run: mise run check
+
+      - name: Extract changelog notes
+        run: |
+          version="$(uv version --short)"
+          .tasks/changelog-extract.sh "$version" > RELEASE_NOTES.md
+          echo "----- release notes -----"
+          cat RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          prerelease_flag=""
+          if [[ "$tag" =~ -(alpha|beta|rc) ]]; then
+            prerelease_flag="--prerelease"
+          fi
+          gh release create "$tag" \
+            --title "$tag" \
+            --notes-file RELEASE_NOTES.md \
+            $prerelease_flag

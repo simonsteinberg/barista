@@ -33,3 +33,23 @@ run = "uv sync"
 [tasks.setup-repo]
 description = "Rename project from 'barista' to a specified name"
 run = ".tasks/setup-repo.sh"
+
+[tasks.check]
+description = "Run the full pre-release gate: format check, lint, tests + coverage"
+run = [
+  "uv run ruff format --check .",
+  "uv run ruff check .",
+  "uv run pytest --cov=barista --cov-report=term-missing",
+]
+
+[tasks.version]
+description = "Print the current project version"
+run = "uv version --short"
+
+[tasks.changelog-check]
+description = "Fail if the [Unreleased] section of CHANGELOG.md has no entries"
+run = ".tasks/changelog-check.sh"
+
+[tasks.release]
+description = "Bump version, roll the changelog, commit, tag, and push (usage: mise run release -- {patch|minor|major})"
+run = ".tasks/release.sh"
